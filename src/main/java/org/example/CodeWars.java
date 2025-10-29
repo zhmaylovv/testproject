@@ -93,5 +93,35 @@ public class CodeWars {
         return count;
     }
 
+    public static boolean substring(String str, String ending) {
+        if (ending.length() > str.length()){
+            return false;
+        }
+        return ending.equals(str.substring(str.length() - ending.length()));
+    }
 
+
+    /**
+     * 6 kyu
+     * Simple sum of pairs
+     * https://www.codewars.com/kata/5bc027fccd4ec86c840000b7/train/java
+     * @param n
+     * @return
+     */
+    public static int simplePairOfSum(long n){
+        if (n < 10) return (int)n;
+        long raz = String.valueOf(n).length() - 1;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < raz; i++) {
+            sb.append(9);
+        }
+        long first = Long.parseLong(sb.toString());
+        int result = 0;
+        long c = n - first;
+        while (c != 0) {
+            result += (int) (c % 10);
+            c = (c / 10);
+        }
+        return result + (int) raz * 9;
+    }
 }

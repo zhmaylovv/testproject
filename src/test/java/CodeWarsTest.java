@@ -6,8 +6,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Arrays;
 
 import static org.example.CodeWars.findMine;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CodeWarsTest {
@@ -74,4 +73,34 @@ public class CodeWarsTest {
         assertEquals(1, CodeWars.lengthOfLongestSubstring("bbbbb"));
         assertEquals(3, CodeWars.lengthOfLongestSubstring("pwwkew"));
     }
+
+    @Test
+    public void staticTests() {
+        assertTrue(CodeWars.substring("samurai", "ai"));
+        assertFalse(CodeWars.substring("sumo", "omo"));
+        assertTrue(CodeWars.substring("ninja", "ja"));
+        assertTrue(CodeWars.substring("sensei", "i"));
+        assertFalse(CodeWars.substring("samurai", "ra"));
+        assertFalse(CodeWars.substring("abc", "abcd"));
+        assertTrue(CodeWars.substring("abc", "abc"));
+        assertTrue(CodeWars.substring("abcabc", "bc"));
+        assertFalse(CodeWars.substring("ails", "fails"));
+        assertTrue(CodeWars.substring("fails", "ails"));
+        assertFalse(CodeWars.substring("this", "fails"));
+        assertTrue(CodeWars.substring("this", ""));
+        assertFalse(CodeWars.substring(":-)", ":-("));
+        assertTrue(CodeWars.substring("!@#$%^&*() :-)", ":-)"));
+        assertFalse(CodeWars.substring("abc\n", "abc"));
+    }
+
+    @Test
+    public void basicTests(){
+        assertEquals(0,CodeWars.simplePairOfSum(0));
+        assertEquals(1,CodeWars.simplePairOfSum(1));
+        assertEquals(18,CodeWars.simplePairOfSum(18));
+        assertEquals(11,CodeWars.simplePairOfSum(29));
+        assertEquals(33,CodeWars.simplePairOfSum(1140));
+        assertEquals(68,CodeWars.simplePairOfSum(50000000));
+    }
+
 }
