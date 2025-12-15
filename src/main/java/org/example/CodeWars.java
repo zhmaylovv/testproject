@@ -1,6 +1,30 @@
 package org.example;
 
+
+import org.example.models.Node;
+
+import java.util.HashMap;
+
 public class CodeWars {
+
+
+    /**
+     * 5 kyu
+     * Can you get the loop ?
+     * https://www.codewars.com/kata/52a89c2ea8ddc5547a000863/train/java
+     * @param node
+     * @return
+     * Надо было просто сложить все в ArrayList, так как индекс ==  count
+     */
+    public int loopSize(Node node) {
+        int count = 0;
+        HashMap<Node, Integer> nodeIntegerHashMap = new HashMap<>();
+        do {
+            nodeIntegerHashMap.put(node, count++);
+            node = node.getNext();
+        } while (!nodeIntegerHashMap.containsKey(node));
+        return nodeIntegerHashMap.size() - nodeIntegerHashMap.get(node);
+    }
 
 
     /**
