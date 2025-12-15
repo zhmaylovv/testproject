@@ -3,8 +3,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.Arrays;
-
 import static org.example.CodeWars.findMine;
 import static org.junit.Assert.*;
 
@@ -101,6 +99,25 @@ public class CodeWarsTest {
         assertEquals(11,CodeWars.simplePairOfSum(29));
         assertEquals(33,CodeWars.simplePairOfSum(1140));
         assertEquals(68,CodeWars.simplePairOfSum(50000000));
+    }
+
+    @Test
+    public void Tests() {
+        assertEquals("makeReadable(0)", "00:00:00", CodeWars.makeReadable(0));
+        assertEquals("makeReadable(5)", "00:00:05", CodeWars.makeReadable(5));
+        assertEquals("makeReadable(60)", "00:01:00", CodeWars.makeReadable(60));
+        assertEquals("makeReadable(86399)", "23:59:59", CodeWars.makeReadable(86399));
+        assertEquals("makeReadable(359999)", "99:59:59", CodeWars.makeReadable(359999));
+    }
+
+    @Test
+    public void testEvilWin() {
+        assertEquals("Evil should win", "Battle Result: Evil eradicates all trace of Good",
+                CodeWars.battle("1 1 1 1 1 1", "1 1 1 1 1 1 1"));
+        assertEquals("Good should win", "Battle Result: Good triumphs over Evil",
+                CodeWars.battle("0 0 0 0 0 10", "0 1 1 1 1 0 0"));
+        assertEquals("Should be a tie", "Battle Result: No victor on this battle field",
+                CodeWars.battle("1 0 0 0 0 0", "1 0 0 0 0 0 0"));
     }
 
 }

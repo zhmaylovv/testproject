@@ -2,6 +2,56 @@ package org.example;
 
 public class CodeWars {
 
+
+    /**
+     * 6 kyu
+     * Good vs Evil
+     * https://www.codewars.com/kata/52761ee4cffbc69732000738/train/java
+     **/
+    public static String battle(String goodAmounts, String evilAmounts) {
+        int[] goodStrength = {1, 2, 3, 3, 4, 10};
+        int[] evilStrength = {1, 2, 2, 2, 3, 5, 10};
+        String goodWin = "Battle Result: Good triumphs over Evil";
+        String evilWin = "Battle Result: Evil eradicates all trace of Good";
+        String drawWin = "Battle Result: No victor on this battle field";
+        int goodArmyStrength = geArmyStrength(goodAmounts, goodStrength);
+        int evilArmyStrength = geArmyStrength(evilAmounts, evilStrength);
+        if (goodArmyStrength == evilArmyStrength) return drawWin;
+        return goodArmyStrength > evilArmyStrength ? goodWin : evilWin;
+    }
+
+    private static int geArmyStrength(String amounts, int[]strength) {
+        int sum = 0;
+        String[] amountsArray = amounts.split(" ");
+        for (int i = 0; i < amountsArray.length; i++) {
+            sum += Integer.parseInt(amountsArray[i]) * strength[i];
+        }
+        return sum;
+    }
+
+    public static String makeReadable(int seconds) {
+        String pattern = "%s:%s:%s";
+        String hh = getHours(seconds);
+        String mm = getMins(seconds);
+        String ss = getSeconds(seconds);
+        return String.format(pattern, hh, mm, ss);
+    }
+
+    private static String getSeconds(int seconds) {
+        int sec = seconds % 60;
+        return sec / 10 > 0 ? String.valueOf(sec) : "0" + sec;
+    }
+
+    private static String getMins(int seconds) {
+        int mins = (seconds % 3600) / 60;
+        return mins / 10 > 0 ? String.valueOf(mins) : "0" + mins;
+    }
+
+    private static String getHours(int seconds) {
+        int hours = seconds / 3600;
+        return hours / 10 > 0 ? String.valueOf(hours) : "0" + hours;
+    }
+
     public static int zadSlavi(int[] deployGraph, int vacationLength) {
         int[] sum = new int[deployGraph.length];
         int count = 0;
@@ -94,7 +144,7 @@ public class CodeWars {
     }
 
     public static boolean substring(String str, String ending) {
-        if (ending.length() > str.length()){
+        if (ending.length() > str.length()) {
             return false;
         }
         return ending.equals(str.substring(str.length() - ending.length()));
@@ -105,11 +155,12 @@ public class CodeWars {
      * 6 kyu
      * Simple sum of pairs
      * https://www.codewars.com/kata/5bc027fccd4ec86c840000b7/train/java
+     *
      * @param n
      * @return
      */
-    public static int simplePairOfSum(long n){
-        if (n < 10) return (int)n;
+    public static int simplePairOfSum(long n) {
+        if (n < 10) return (int) n;
         long raz = String.valueOf(n).length() - 1;
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < raz; i++) {
