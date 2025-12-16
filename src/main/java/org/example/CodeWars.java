@@ -3,18 +3,71 @@ package org.example;
 
 import org.example.models.Node;
 
-import java.util.HashMap;
+import java.util.*;
 
 public class CodeWars {
+
+
+    /**
+     * 4 kyu
+     * The observed PIN
+     * https://www.codewars.com/kata/5263c6999e0f40dee200059d/train/java
+     *
+     * @param observed
+     * @return
+     */
+    public static List<String> getPINs(String observed) {
+        Map<String,String> numbers = new HashMap<String,String>() {{
+            put("1", "124");
+            put("2", "2135");
+            put("3", "326");
+            put("4", "4157");
+            put("5", "54268");
+            put("6", "6953");
+            put("7", "748");
+            put("8", "87590");
+            put("9", "986");
+            put("0", "08");
+        }};
+        Set<String> result = new HashSet<>();
+        Set<String> temp = new HashSet<>();
+        for (int i = 0; i < observed.length(); i++) {
+            String[] split = observed.split("");
+            String nums = numbers.get(split[i]);
+            if (result.isEmpty()) {
+                result.addAll(Arrays.asList(nums.split("")));
+                continue;
+            }
+            for (String r : result) {
+                for (String n : nums.split("") ) {
+                    temp.add(r + n);
+                }
+            }
+            result = temp;
+            temp = new HashSet<>();
+        }
+        return new ArrayList<>(result);
+    }
+
+    public static int lettersToNumbers(String s) {
+        int sum = 0;
+        char[] split = s.toCharArray();
+        for (char c : split) {
+            if (c >= 48 && c <= 57) sum = sum + c - 48;
+            else if (c >= 65 && c <= 90) sum = sum + ((c - 64) * 2);
+            else if (c >= 97 && c <= 122) sum = sum + c - 96;
+        }
+        return sum;
+    }
 
 
     /**
      * 5 kyu
      * Can you get the loop ?
      * https://www.codewars.com/kata/52a89c2ea8ddc5547a000863/train/java
+     *
      * @param node
-     * @return
-     * Надо было просто сложить все в ArrayList, так как индекс ==  count
+     * @return Надо было просто сложить все в ArrayList, так как индекс ==  count
      */
     public int loopSize(Node node) {
         int count = 0;
@@ -44,7 +97,7 @@ public class CodeWars {
         return goodArmyStrength > evilArmyStrength ? goodWin : evilWin;
     }
 
-    private static int geArmyStrength(String amounts, int[]strength) {
+    private static int geArmyStrength(String amounts, int[] strength) {
         int sum = 0;
         String[] amountsArray = amounts.split(" ");
         for (int i = 0; i < amountsArray.length; i++) {
