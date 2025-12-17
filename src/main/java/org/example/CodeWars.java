@@ -1,12 +1,314 @@
 package org.example;
 
 
+import org.example.models.Hand;
 import org.example.models.Node;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CodeWars {
 
+    /**
+     * Не буду рефакторить- что бы потом, когда-нибудь, было стыдно.
+     * https://www.codewars.com/kata/524c74f855025e2495000262/train/java
+     * 3 kyu
+     * Texas Hold'em Hands
+     *
+     * @param holeCards
+     * @param communityCards
+     * @return
+     */
+
+    private static final Map<String, Integer> CARDS_VALUE = new LinkedHashMap<>() {{
+        put("A", 14);
+        put("K", 13);
+        put("Q", 12);
+        put("J", 11);
+        put("10", 10);
+        put("9", 9);
+        put("8", 8);
+        put("7", 7);
+        put("6", 6);
+        put("5", 5);
+        put("4", 4);
+        put("3", 3);
+        put("2", 2);
+    }};
+
+    public static Hand hand(String[] holeCards, String[] communityCards) {
+        Map<String, List<String>> cardMaps = getCardsMap(holeCards, communityCards);
+
+        if (isItStraightFlush(holeCards, communityCards)) {
+            return getStraightFlushHand(holeCards, communityCards);
+        } else if (isItFour(cardMaps)) {
+            return getFourHand(cardMaps);
+        } else if (isItFullHouse(cardMaps)) {
+            return getFullHouseHand(cardMaps);
+        } else if (isItFlush(holeCards, communityCards)) {
+            return getFlushHand(holeCards, communityCards);
+        } else if (isItStraight(holeCards, communityCards)) {
+            return getStraightHand(holeCards, communityCards);
+        } else if (isItThree(cardMaps)) {
+            return getThreeHand(cardMaps);
+        } else if (isTwoPair(cardMaps)) {
+            return getTwoPairHand(cardMaps);
+        } else if (isPair(cardMaps)) {
+            return getPairHand(cardMaps);
+        } else return getNothing(holeCards, communityCards);
+    }
+
+    private static Hand getNothing(String[] holeCards, String[] communityCards) {
+        String[] allCards = getAllCards(holeCards, communityCards);
+        List<String> cardList = Arrays.stream(allCards)
+                .map(s -> s.substring(0, s.length() - 1))
+                .collect(Collectors.toList());
+        String[] cardsByRank = getCardsByRank(cardList);
+        Set<String> unic = new LinkedHashSet<>(List.of(cardsByRank));
+        return new Hand("nothing", Arrays.copyOfRange(unic.toArray(new String[0]), 0, 5));
+    }
+
+    private static Hand getPairHand(Map<String, List<String>> cardMaps) {
+        List<String> pairs = cardMaps.entrySet().stream()
+                .filter(e -> e.getValue().size() == 2)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        List<String> exceptList = new ArrayList<>();
+        exceptList.add(pairs.get(0));
+        String first = getHighestExcept(cardMaps, exceptList);
+        exceptList.add(first);
+        String second = getHighestExcept(cardMaps, exceptList);
+        exceptList.add(second);
+        String third = getHighestExcept(cardMaps, exceptList);
+        return new Hand("pair", new String[]{pairs.get(0), first, second, third});
+    }
+
+    private static boolean isPair(Map<String, List<String>> cardMaps) {
+        return cardMaps.values().stream().anyMatch(l -> l.size() == 2);
+    }
+
+    private static Hand getTwoPairHand(Map<String, List<String>> cardMaps) {
+        List<String> pairs = cardMaps.entrySet().stream()
+                .filter(e -> e.getValue().size() == 2)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        pairs.sort(Comparator.comparingInt(CARDS_VALUE::get).reversed());
+        String kicker = getHighestExcept(cardMaps, List.of(new String[]{pairs.get(0), pairs.get(1)}));
+        return new Hand("two pair", new String[]{pairs.get(0), pairs.get(1), kicker});
+    }
+
+    private static boolean isTwoPair(Map<String, List<String>> cardMaps) {
+        return cardMaps.values().stream().filter(l -> l.size() == 2).count() >= 2
+                && cardMaps.values().stream().noneMatch(l -> l.size() == 3);
+    }
+
+    private static Hand getThreeHand(Map<String, List<String>> cardMaps) {
+        List<String> thirds = cardMaps.entrySet().stream()
+                .filter(e -> e.getValue().size() == 3)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        String second = getHighestExcept(cardMaps, List.of(new String[]{thirds.get(0)}));
+        String third = getHighestExcept(cardMaps, List.of(new String[]{thirds.get(0), second}));
+        return new Hand("three-of-a-kind", new String[]{thirds.get(0), second, third});
+    }
+
+    private static boolean isItThree(Map<String, List<String>> cardMaps) {
+        return cardMaps.values().stream().anyMatch(l -> l.size() == 3);
+    }
+
+    private static Hand getStraightHand(String[] holeCards, String[] communityCards) {
+        List<String> cards = Stream.of(getAllCards(holeCards, communityCards))
+                .map(s -> s.substring(0, s.length() - 1))
+                .collect(Collectors.toList());
+        String[] cardsRow = getCardsRow(getCardsByRank(cards));
+        return new Hand("straight", cardsRow);
+    }
+
+    private static boolean isItStraight(String[] holeCards, String[] communityCards) {
+        List<String> cards = Stream.of(getAllCards(holeCards, communityCards))
+                .map(s -> s.substring(0, s.length() - 1))
+                .collect(Collectors.toList());
+        return isFiveCardsOnRaw(getCardsByRank(cards));
+    }
+
+    private static Hand getFlushHand(String[] holeCards, String[] communityCards) {
+        Map<String, List<String>> types = getFlushMap(holeCards, communityCards);
+        String[] cards = getCardsByRank(types.values().stream().filter(l -> l.size() >= 5).findFirst().orElseThrow());
+        return new Hand("flush", Arrays.copyOfRange(cards, 0, 5));
+    }
+
+    private static Hand getFullHouseHand(Map<String, List<String>> cardMaps) {
+        List<String> thirds = cardMaps.entrySet().stream()
+                .filter(e -> e.getValue().size() == 3)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        String first = null;
+        String second = null;
+        for (String s : CARDS_VALUE.keySet()) {
+            if (thirds.contains(s) && first == null) {
+                first = s;
+            } else if (thirds.contains(s) && first != null) {
+                second = s;
+            }
+        }
+
+        if (second == null) {
+            List<String> twos = cardMaps.entrySet().stream()
+                    .filter(e -> e.getValue().size() == 2)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+            for (String s : CARDS_VALUE.keySet()) {
+                if (twos.contains(s)) {
+                    second = s;
+                    break;
+                }
+            }
+        }
+
+        return new Hand("full house", new String[]{first, second});
+    }
+
+    private static boolean isItFullHouse(Map<String, List<String>> cardMaps) {
+        return (cardMaps.values().stream().filter(l -> l.size() == 3).count() == 2) ||
+                ((cardMaps.values().stream().anyMatch(l -> l.size() == 3))
+                        && (cardMaps.values().stream().anyMatch(l -> l.size() == 2)));
+    }
+
+    private static Hand getFourHand(Map<String, List<String>> cardMaps) {
+        String four = cardMaps.entrySet().stream()
+                .filter(e -> e.getValue().size() == 4)
+                .findFirst()
+                .map(Map.Entry::getKey)
+                .orElseThrow();
+        String highest = getHighestExcept(cardMaps, Collections.singletonList(four));
+        return new Hand("four-of-a-kind", new String[]{four, highest});
+    }
+
+    private static String getHighestExcept(Map<String, List<String>> cardMaps, List<String> except) {
+        for (String s : CARDS_VALUE.keySet()) {
+            if (cardMaps.containsKey(s) && !except.contains(s)) {
+                return s;
+            }
+        }
+        throw new RuntimeException();
+    }
+
+    private static boolean isItFour(Map<String, List<String>> cardMaps) {
+        return cardMaps.values().stream().anyMatch(l -> l.size() == 4);
+    }
+
+    private static Map<String, List<String>> getCardsMap(String[] holeCards, String[] communityCards) {
+        Map<String, List<String>> types = new HashMap<>();
+        for (String s : holeCards) {
+            String type = s.substring(0, s.length() - 1);
+            if (!types.containsKey(type)) {
+                types.put(type, new ArrayList<>());
+            }
+            types.get(type).add(s.substring(s.length() - 1));
+        }
+        for (String s : communityCards) {
+            String type = s.substring(0, s.length() - 1);
+            if (!types.containsKey(type)) {
+                types.put(type, new ArrayList<>());
+            }
+            types.get(type).add(s.substring(s.length() - 1));
+        }
+        return types;
+    }
+
+    private static String[] getAllCards(String[] holeCards, String[] communityCards) {
+        String[] result = new String[7];
+        System.arraycopy(holeCards, 0, result, 0, 2);
+        System.arraycopy(communityCards, 0, result, 2, 5);
+        return result;
+    }
+
+    private static Hand getStraightFlushHand(String[] holeCards, String[] communityCards) {
+        return new Hand("straight-flush", getStraightCards(holeCards, communityCards));
+    }
+
+    private static String[] getStraightCards(String[] holeCards, String[] communityCards) {
+        Map<String, List<String>> flushMap = getFlushMap(holeCards, communityCards);
+        String[] cards = new String[7];
+        for (List<String> v : flushMap.values()) {
+            if (v.size() >= 5) {
+                cards = getCardsRow(getCardsByRank(v));
+            }
+        }
+        return Arrays.copyOfRange(cards, 0, 5);
+    }
+
+    private static boolean isItStraightFlush(String[] holeCards, String[] communityCards) {
+        if (isItFlush(holeCards, communityCards)) {
+            Map<String, List<String>> flushMap = getFlushMap(holeCards, communityCards);
+            for (List<String> v : flushMap.values()) {
+                if (v.size() >= 5) {
+                    String[] cards = getCardsByRank(v);
+                    if (isFiveCardsOnRaw(cards)) {
+                        return true;
+                    }
+                }
+                ;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isFiveCardsOnRaw(String[] cards) {
+        String[] cardsRow = getCardsRow(cards);
+        return cardsRow.length >= 5;
+    }
+
+    private static String[] getCardsRow(String[] cards) {
+        Set<String> result = new LinkedHashSet<>();
+        for (int i = 0; i < cards.length - 1; i++) {
+            if (result.size() == 5) return result.toArray(new String[0]);
+            if (CARDS_VALUE.get(cards[i]) - CARDS_VALUE.get(cards[i + 1]) == 1) {
+                result.add(cards[i]);
+            } else if (CARDS_VALUE.get(cards[i]) - CARDS_VALUE.get(cards[i + 1]) > 1) {
+                result.clear();
+            }
+            if (result.size() == 4) {
+                result.add(cards[i + 1]);
+                return result.toArray(new String[0]);
+            }
+        }
+        return result.toArray(new String[0]);
+    }
+
+    private static String[] getCardsByRank(List<String> cards) {
+        cards.sort(Comparator.comparingInt(CARDS_VALUE::get).reversed());
+        return cards.toArray(new String[0]);
+    }
+
+
+    private static boolean isItFlush(String[] holeCards, String[] communityCards) {
+        Map<String, List<String>> types = getFlushMap(holeCards, communityCards);
+        for (List<String> v : types.values()) {
+            if (v.size() >= 5) return true;
+        }
+        return false;
+    }
+
+    private static Map<String, List<String>> getFlushMap(String[] holeCards, String[] communityCards) {
+        Map<String, List<String>> types = new HashMap<>();
+        for (String s : holeCards) {
+            String type = s.substring(s.length() - 1);
+            if (!types.containsKey(type)) {
+                types.put(type, new ArrayList<>());
+            }
+            types.get(type).add(s.substring(0, s.length() - 1));
+        }
+        for (String s : communityCards) {
+            String type = s.substring(s.length() - 1);
+            if (!types.containsKey(type)) {
+                types.put(type, new ArrayList<>());
+            }
+            types.get(type).add(s.substring(0, s.length() - 1));
+        }
+        return types;
+    }
 
     /**
      * 4 kyu
@@ -17,7 +319,7 @@ public class CodeWars {
      * @return
      */
     public static List<String> getPINs(String observed) {
-        Map<String,String> numbers = new HashMap<String,String>() {{
+        Map<String, String> numbers = new HashMap<String, String>() {{
             put("1", "124");
             put("2", "2135");
             put("3", "326");
@@ -39,7 +341,7 @@ public class CodeWars {
                 continue;
             }
             for (String r : result) {
-                for (String n : nums.split("") ) {
+                for (String n : nums.split("")) {
                     temp.add(r + n);
                 }
             }

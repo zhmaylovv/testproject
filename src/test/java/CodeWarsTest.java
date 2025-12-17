@@ -40,20 +40,20 @@ public class CodeWarsTest {
     @Test
     public void histogramPercent() {
         final String expected =
-                "6|██ 5%\n"+
-                        "5|\n"+
-                        "4|███████ 15%\n"+
-                        "3|███████████████████████████████████ 70%\n"+
-                        "2|█ 3%\n"+
+                "6|██ 5%\n" +
+                        "5|\n" +
+                        "4|███████ 15%\n" +
+                        "3|███████████████████████████████████ 70%\n" +
+                        "2|█ 3%\n" +
                         "1|███ 7%\n";
-        assertEquals(expected, CodeWars.histogramPercent(new int[]{0,0,0,0,0,0}));
+        assertEquals(expected, CodeWars.histogramPercent(new int[]{0, 0, 0, 0, 0, 0}));
     }
 
     @Test()
     public void basicTestCases() {
-        assertArrayEquals(new int[] {0,0}, findMine( new int[][] { {1, 0}, {0, 0} } ));
-        assertArrayEquals(new int[] {0,0}, findMine( new int[][] { {1, 0, 0}, {0, 0, 0}, {0, 0, 0} } ));
-        assertArrayEquals(new int[] {2,2}, findMine( new int[][] { {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 0} } ));
+        assertArrayEquals(new int[]{0, 0}, findMine(new int[][]{{1, 0}, {0, 0}}));
+        assertArrayEquals(new int[]{0, 0}, findMine(new int[][]{{1, 0, 0}, {0, 0, 0}, {0, 0, 0}}));
+        assertArrayEquals(new int[]{2, 2}, findMine(new int[][]{{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 0}}));
 
     }
 
@@ -68,7 +68,7 @@ public class CodeWarsTest {
     }
 
     @Test
-    public void lengthOfLongestSubstring(){
+    public void lengthOfLongestSubstring() {
         assertEquals(2, CodeWars.lengthOfLongestSubstring("aab"));
         assertEquals(3, CodeWars.lengthOfLongestSubstring("dvdf"));
         assertEquals(1, CodeWars.lengthOfLongestSubstring("aa"));
@@ -97,13 +97,13 @@ public class CodeWarsTest {
     }
 
     @Test
-    public void basicTests(){
-        assertEquals(0,CodeWars.simplePairOfSum(0));
-        assertEquals(1,CodeWars.simplePairOfSum(1));
-        assertEquals(18,CodeWars.simplePairOfSum(18));
-        assertEquals(11,CodeWars.simplePairOfSum(29));
-        assertEquals(33,CodeWars.simplePairOfSum(1140));
-        assertEquals(68,CodeWars.simplePairOfSum(50000000));
+    public void basicTests() {
+        assertEquals(0, CodeWars.simplePairOfSum(0));
+        assertEquals(1, CodeWars.simplePairOfSum(1));
+        assertEquals(18, CodeWars.simplePairOfSum(18));
+        assertEquals(11, CodeWars.simplePairOfSum(29));
+        assertEquals(33, CodeWars.simplePairOfSum(1140));
+        assertEquals(68, CodeWars.simplePairOfSum(50000000));
     }
 
     @Test
@@ -135,12 +135,11 @@ public class CodeWarsTest {
         tester("Give me 5!", 73);
         tester("Give me five!", 110);
     }
-    void tester(String input, int expected){
-        String message = String.format("Failed for input: %s",input);
+
+    void tester(String input, int expected) {
+        String message = String.format("Failed for input: %s", input);
         assertEquals(message, expected, CodeWars.lettersToNumbers(input));
     }
-
-
 
 
     @Test
@@ -149,6 +148,7 @@ public class CodeWarsTest {
             test(entered, Arrays.asList(expectations.get(entered)), CodeWars.getPINs(entered));
         }
     }
+
     public static HashMap<String, String[]> expectations = new HashMap<String, String[]>() {
         {
             put("8", new String[]{"5", "7", "8", "9", "0"});
@@ -157,6 +157,7 @@ public class CodeWarsTest {
         }
     };
     private final static Comparator<String> comp = (s1, s2) -> s1.compareTo(s2);
+
     private void test(String entered, List<String> expected, List<String> result) {
         result.sort(comp);
         expected.sort(comp);
